@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <table id="customers">
+  <div class="container">
+
+    <table >
       <thead>
         <tr>
           <th>Дата</th>
@@ -10,98 +11,130 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Alfreds Futterkiste</td>
-          <td>Maria Anders</td>
-          <td>Germany</td>
-        </tr>
-        <tr>
-          <td>Berglunds snabbköp</td>
-          <td>Christina Berglund</td>
-          <td>Sweden</td>
-        </tr>
-        <tr>
-          <td>Centro comercial Moctezuma</td>
-          <td>Francisco Chang</td>
-          <td>Mexico</td>
-        </tr>
-        <tr>
-          <td>Ernst Handel</td>
-          <td>Roland Mendel</td>
-          <td>Austria</td>
-        </tr>
-        <tr>
-          <td>Island Trading</td>
-          <td>Helen Bennett</td>
-          <td>UK</td>
-        </tr>
-        <tr>
-          <td>Königlich Essen</td>
-          <td>Philip Cramer</td>
-          <td>Germany</td>
-        </tr>
-        <tr>
-          <td>Laughing Bacchus Winecellars</td>
-          <td>Yoshi Tannamuri</td>
-          <td>Canada</td>
-        </tr>
-        <tr>
-          <td>Magazzini Alimentari Riuniti</td>
-          <td>Giovanni Rovelli</td>
-          <td>Italy</td>
-        </tr>
-        <tr>
-          <td>North/South</td>
-          <td>Simon Crowther</td>
-          <td>UK</td>
-        </tr>
-        <tr>
-          <td>Paris spécialités</td>
-          <td>Marie Bertrand</td>
-          <td>France</td>
+        <tr v-for="item in list" :key="item.id">
+          <td>{{ item.date }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.count }}</td>
+          <td>{{ item.distance }}</td>
         </tr>
       </tbody>
 
     </table>
-
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item">
+          <button type="button" class="page-link" v-if="page !== 1" @click="page--"> Previous </button>
+        </li>
+        <li class="page-item">
+          <button type="button" class="page-link" v-for="(pageNumber, index) in pages.slice(page-1, page+5)" :key="index" @click="page = pageNumber"> {{pageNumber}} </button>
+        </li>
+        <li class="page-item">
+          <button type="button" @click="page++" v-if="page < pages.length" class="page-link"> Next </button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
 <script>
 export default {
-  name: "TableComponent"
+  name: "TableComponent",
+  data(){
+    return {
+      list: [
+        {
+          'id': 1,
+          'date' : '27.09.2022',
+          'name' : 'Vie tour',
+          'count' : '21',
+          'distance' : '150',
+        },
+        {
+          'id': 2,
+          'date' : '28.09.2022',
+          'name' : 'Line tour',
+          'count' : '21',
+          'distance' : '150',
+        },
+        {
+          'id': 3,
+          'date' : '29.09.2022',
+          'name' : 'Counter tour',
+          'count' : '21',
+          'distance' : '150',
+        },
+        {
+          'id': 4,
+          'date' : '15.09.2022',
+          'name' : 'Nice tour',
+          'count' : '21',
+          'distance' : '150',
+        },
+        {
+          'id': 5,
+          'date' : '13.09.2022',
+          'name' : 'Happy tour',
+          'count' : '21',
+          'distance' : '150',
+        },
+        {
+          'id': 6,
+          'date' : '12.09.2022',
+          'name' : 'Boston tour',
+          'count' : '21',
+          'distance' : '150',
+        },
+      ],
+      page: 1,
+      count_per_page: 2,
+      pages: []
+    }
+  },
+  methods: {
+    setPages () {
+      let numberOfPages = Math.ceil(this.list.length / this.count_per_page);
+      for (let index = 1; index <= numberOfPages; index++) {
+        this.pages.push(index);
+      }
+    },
+  },
+  mounted() {
+    this.setPages()
+  }
 }
 </script>
 
-<style scoped>
-table {
-  border-radius: 10px;
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-  max-width: 80%;
-  margin: 0 auto;
-}
+<style lang="scss" scoped>
+.container{
+  table {
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 70%;
+    margin: 0 auto;
+    td, th{
+      border: 1px solid #ddd;
+      padding: 8px;
+      cursor: pointer;
+    }
+    thead tr{
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #000e96;
+      color: white;
+    }
+    tbody{
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+        &:hover{
+          background-color: #ddd;
 
-table td, #customers th {
-  border: 1px solid #ddd;
-  padding: 8px;
-  cursor: pointer;
-}
+        }
+      }
+    }
+  }
 
-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-table tr:hover {
-  background-color: #ddd;
-}
-
-table th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #000e96;
-  color: white;
 }
 </style>
