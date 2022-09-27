@@ -11,7 +11,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in list" :key="item.id">
+        <tr v-for="item in displayedPosts" :key="item.id">
           <td>{{ item.date }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.count }}</td>
@@ -20,16 +20,10 @@
       </tbody>
 
     </table>
-    <nav aria-label="Page navigation example">
+    <nav aria-label="Page navigation example" class="navigation">
       <ul class="pagination">
         <li class="page-item">
-          <button type="button" class="page-link" v-if="page !== 1" @click="page--"> Previous </button>
-        </li>
-        <li class="page-item">
-          <button type="button" class="page-link" v-for="(pageNumber, index) in pages.slice(page-1, page+5)" :key="index" @click="page = pageNumber"> {{pageNumber}} </button>
-        </li>
-        <li class="page-item">
-          <button type="button" @click="page++" v-if="page < pages.length" class="page-link"> Next </button>
+          <button type="button" class="page-link" v-for="(pageNumber, index) in pages" :key="index" :class="{'active_page' : active_page === pageNumber }" @click="changePage(pageNumber)"> {{pageNumber}} </button>
         </li>
       </ul>
     </nav>
@@ -37,6 +31,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "TableComponent",
   data(){
@@ -85,26 +80,55 @@ export default {
           'distance' : '150',
         },
       ],
+      // list: [],
       page: 1,
-      count_per_page: 2,
-      pages: []
+      count_per_page: 4,
+      pages: [],
+      active_page: 1,
+      isActive: true,
     }
   },
   methods: {
-    setPages () {
-      let numberOfPages = Math.ceil(this.list.length / this.count_per_page);
+    getLists(){
+      axios.post('https://apimocha.com/welbex/lists').then((res) => {
+        this.list = res.data.data
+        this.setPages(this.list)
+      })
+    },
+    setPages (list) {
+      let numberOfPages = Math.ceil(list.length / this.count_per_page);
       for (let index = 1; index <= numberOfPages; index++) {
         this.pages.push(index);
       }
     },
+    paginate () {
+      let page = this.page;
+      let perPage = this.count_per_page;
+      let from = (page * perPage) - perPage;
+      let to = (page * perPage);
+      return  this.list.slice(from, to);
+    },
+    changePage(int){
+      this.page = int
+      this.active_page = int
+    }
+  },
+  computed: {
+    displayedPosts () {
+      return this.paginate(this.posts);
+    }
   },
   mounted() {
-    this.setPages()
+    // this.setPages()
+    this.getLists()
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.active_page{
+  transform: scale(1.1);
+}
 .container{
   table {
     border-radius: 10px;
@@ -131,6 +155,22 @@ export default {
         &:hover{
           background-color: #ddd;
 
+        }
+      }
+    }
+  }
+  .navigation{
+    .pagination{
+      .page-item{
+        list-style-type: none;
+        button{
+          background: transparent;
+          border: 1px solid grey;
+          padding: 5px 20px;
+          font-size: 20px;
+          &:not(:last-child){
+            margin-right: 10px;
+          }
         }
       }
     }
